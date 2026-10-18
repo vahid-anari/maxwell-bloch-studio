@@ -134,6 +134,7 @@ def run_update(check=False, yes=False, latest="99.0.0", notes=(), kind="pip", an
         kind=lambda: kind,
         ask=lambda prompt: answer,
         run=run,
+        installed=lambda: latest,
     )
     return code, calls
 
@@ -160,13 +161,13 @@ def test_update_asks_first(capsys):
 def test_update_pip(capsys):
     code, calls = run_update(answer="y", kind="pip")
     assert code == 0
-    assert calls == [[sys.executable, "-m", "pip", "install", "--upgrade", DIST_NAME]]
+    assert calls == [[sys.executable, "-m", "pip", "install", "--upgrade", "--no-cache-dir", DIST_NAME]]
 
 
 def test_update_pipx():
     code, calls = run_update(yes=True, kind="pipx")
     assert code == 0
-    assert calls[0][1:] == ["upgrade", DIST_NAME]
+    assert calls[0][1:] == ["upgrade", DIST_NAME, "--pip-args=--no-cache-dir"]
 
 
 def test_update_refuses_editable(capsys):
