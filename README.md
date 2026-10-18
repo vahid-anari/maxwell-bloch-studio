@@ -46,6 +46,10 @@ mbstudio install-app
 This adds Maxwell Bloch Studio to your Applications folder (macOS), the Start menu
 (Windows) or the applications menu (Linux). It keeps working after updates.
 
+Only need the numerical solver in your own Python code, without the app? Install
+[mbsolver](https://github.com/vahid-anari/mbsolver) instead: `pip install mbsolver`
+(see [Using the solver from Python](#using-the-solver-from-python)).
+
 ## Running the application
 
 ```bash
