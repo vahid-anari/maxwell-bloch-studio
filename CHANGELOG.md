@@ -4,6 +4,12 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## Unreleased
+- The equations reference is now mbsolver's two-level model document
+  (`docs/two_level.pdf`), with a section mapping symbols to the solver's
+  arguments and a list of references. Its LaTeX source moved to mbsolver;
+  `tools/build_docs.sh` copies the PDF from a clone of mbsolver next to this repository.
+
 ## 10.5.0 — 2026-10-17
 - The launcher (`mbstudio install-app`) and the update check (`mbstudio update`,
   Help ▸ Check for Updates…, Update Now) now come from sciwidgets 0.11 (`sciwidgets.app`),

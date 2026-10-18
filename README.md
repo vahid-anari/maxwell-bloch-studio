@@ -158,7 +158,11 @@ PDF exports include the plot plus a report page containing metadata and the curr
 ## Documentation
 
 The user guide and the equations reference (PDF) are installed with the app;
-open them from the Help and Info menus.
+open them from the Help and Info menus. The equations reference is the
+two-level model document of [mbsolver](https://github.com/vahid-anari/mbsolver)
+(`docs/two_level.pdf`), the solver package the app runs on;
+`sh tools/build_docs.sh` builds the user guide and copies it from a clone of
+mbsolver next to this repository.
 
 ## Development
 
