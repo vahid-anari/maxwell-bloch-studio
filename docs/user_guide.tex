@@ -75,7 +75,7 @@ The app is designed around fast interactive exploration. In normal use, there is
 The solver evolves a dimensionless one-dimensional Maxwell--Bloch system
 for a driven two-level medium. The equations solved by the application are
 \begin{align}
-  \pderiv{w}{\tau'}
+  \frac{\partial w}{\partial \tau'}
     &= A'R - \frac{w - w_0}{T_1'} + \Lambda_n',
   \label{eq:realw}\\[8pt]
   \pderiv{R}{\tau'}
@@ -296,9 +296,9 @@ The \tab{Sample} tab defines the global physical scaling:
 From these values, the app derives internal scaling quantities such as the coupling constant $\eta$.
 The expression used by the app can be viewed from \menu{Info $\to$ Scaling Formula}.
 
-\subsection{Grid Tab}
+\subsection{Solver Tab}
 
-The \tab{Grid} tab controls the numerical resolution:
+The \tab{Solver} tab controls the numerical resolution:
 \begin{center}
 \begin{tabular}{@{}lll@{}}
   \toprule
@@ -312,6 +312,15 @@ The \tab{Grid} tab controls the numerical resolution:
 \end{center}
 
 Increasing $N_t$ or $N_z$ generally improves resolution but also increases solve time.
+
+\paragraph{Model.} \textbf{Adiabatic (rate equations)} replaces the coherence equation by its
+steady state, $R = R_0 - T_2 A w$, so only $w$ and $A$ are solved:
+\begin{align*}
+  \frac{\partial w}{\partial \tau'} &= A R_0 - T_2 A^2 w - \frac{w - w_0}{T_1} + \Lambda_n, &
+  \frac{\partial A}{\partial z'} &= -\eta R_0 + \eta T_2 A w .
+\end{align*}
+The approximation holds when $T_2$ is short compared with the time over which $A$ and $w$ change.
+It needs a finite $T_2$; with $T_2 = \infty$ the solve is refused and the previous results stay shown.
 
 \subsection{Slice Tab}
 
@@ -770,7 +779,7 @@ The numerical solver itself is the separate package \texttt{mbsolver}
 \begin{enumerate}
   \item Launch the application.
   \item Set the physical sample parameters in \tab{Sample}.
-  \item Adjust the numerical resolution in \tab{Grid} if needed.
+  \item Adjust the numerical resolution in \tab{Solver} if needed.
   \item Choose the initial state in \tab{ICs}.
   \item Set the relaxation times in \tab{T\textsubscript{1}} and
         \tab{T\textsubscript{2}}, either as constants or as step profiles.

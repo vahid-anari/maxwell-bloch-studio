@@ -2,7 +2,8 @@
 
 The tabs hand over one flat mapping keyed by widget path (``"solve.grid.nt"``,
 ``"solve.pump.pulse1"``, ...). This module turns it into a
-``mbsolver.two_level.solve_1d`` call and the result back into the mapping the
+``mbsolver.two_level.solve_1d`` call (or ``solve_1d_adiabatic`` when
+``"solve.adiabatic"`` is on) and the result back into the mapping the
 rest of the app uses.
 """
 
@@ -49,6 +50,11 @@ def solve_maxwell_bloch(params: Mapping[str, Any]) -> dict[str, np.ndarray]:
         Mapping with ``time``, ``intensity``, ``w``, ``lambda_n`` (pump),
         ``A0`` (boundary field) and ``t1``, ``t2`` on the time grid.
     """
+    solver = solve_1d
+    if params.get("solve.adiabatic", False):
+        # Temporary: only in the editable mbsolver on the ``adiabatic`` branch.
+        from mbsolver.two_level import solve_1d_adiabatic as solver
+
     derived = sample_scaling(params["solve.sample"])
     ics = params["solve.ics"]
     if ics["use_theta0"]:
@@ -56,7 +62,7 @@ def solve_maxwell_bloch(params: Mapping[str, Any]) -> dict[str, np.ndarray]:
     else:
         initial = {"w0": ics["w0"], "R0": ics["R0"]}
 
-    res = solve_1d(
+    res = solver(
         t_max=params["solve.grid.t_max"],
         nt=params["solve.grid.nt"],
         nz=params["solve.grid.nz"],

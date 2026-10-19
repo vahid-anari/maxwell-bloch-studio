@@ -504,7 +504,7 @@
       },
       {
         "id": "grid",
-        "title": "Grid",
+        "title": "Solver",
         "layout": {
           "column": [
             {
@@ -554,6 +554,19 @@
                   "min_limit_inclusive": false,
                   "max_limit": 10000000000.0,
                   "max_limit_inclusive": false
+                }
+              ]
+            },
+            {
+              "group": "Model",
+              "column": [
+                {
+                  "type": "toggle",
+                  "path": "solve.adiabatic",
+                  "text": "Adiabatic (rate equations)",
+                  "label_on": "R = R_0 - T_2\\, A\\, w",
+                  "label_off": "\\dot{R} = -A\\, w - (R - R_0) / T_2",
+                  "checked": false
                 }
               ]
             }

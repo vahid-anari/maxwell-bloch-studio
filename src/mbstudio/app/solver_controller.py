@@ -18,6 +18,7 @@ class SolverWorker(QObject):
     """Background worker that runs the Maxwell-Bloch solver off the UI thread."""
 
     finished = Signal(dict)
+    failed = Signal(str)
 
     def __init__(self, params: dict[str, Any]) -> None:
         """Initialize the worker with one immutable parameter snapshot.
@@ -29,9 +30,13 @@ class SolverWorker(QObject):
         self._params = params
 
     def run(self) -> None:
-        """Execute the solver and emit the resulting output dictionary."""
+        """Execute the solver; emit the result, or the error message if the parameters are rejected."""
 
-        result = solve_maxwell_bloch(self._params)
+        try:
+            result = solve_maxwell_bloch(self._params)
+        except (ValueError, ImportError) as e:
+            self.failed.emit(str(e))
+            return
         self.finished.emit(result)
 
 
@@ -55,6 +60,7 @@ class SolverController(QObject):
         get_params: Callable[[], dict[str, Any]],
         on_state_solving: Callable[[], None],
         on_state_ready: Callable[[], None],
+        on_failed: Callable[[str], None] | None = None,
     ) -> None:
         """Initialize the solver controller.
 
@@ -65,12 +71,15 @@ class SolverController(QObject):
             get_params: Callable returning the current parameter snapshot to solve.
             on_state_solving: Callback invoked on the main thread when a solve starts.
             on_state_ready: Callback invoked on the main thread when a solve finishes.
+            on_failed: Callback invoked on the main thread with the message when the
+                solver rejects the parameters (the previous results stay shown).
         """
         super().__init__(parent)
         self._on_finished = on_finished
         self._get_params = get_params
         self._on_state_solving = on_state_solving
         self._on_state_ready = on_state_ready
+        self._on_failed = on_failed
 
         self._is_solving = False
         self._has_pending = False
@@ -127,6 +136,9 @@ class SolverController(QObject):
         worker.finished.connect(self._handle_finished)
         worker.finished.connect(thread.quit)
         worker.finished.connect(worker.deleteLater)
+        worker.failed.connect(self._handle_failed)
+        worker.failed.connect(thread.quit)
+        worker.failed.connect(worker.deleteLater)
         thread.finished.connect(self._handle_thread_finished)
         thread.finished.connect(thread.deleteLater)
 
@@ -148,6 +160,17 @@ class SolverController(QObject):
         self._is_solving = False
         self._on_state_ready()
         self._on_finished(result)
+
+    def _handle_failed(self, message: str) -> None:
+        """Handle a rejected solve on the main thread.
+
+        Args:
+            message: Error message from the solver.
+        """
+        self._is_solving = False
+        self._on_state_ready()
+        if self._on_failed is not None and not self._has_pending:
+            self._on_failed(message)
 
     def _handle_thread_finished(self) -> None:
         """Drop references to the finished thread and start any queued solve."""

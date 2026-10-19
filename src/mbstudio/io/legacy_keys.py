@@ -16,11 +16,13 @@ LEGACY_KEY_RENAMES: Dict[str, str] = {
 
 ADDED_PARAM_DEFAULTS: Dict[str, Any] = {
     "results.scale.normalize": True,
+    "solve.adiabatic": False,
 }
 """Parameter keys added in newer versions, with values reproducing old behaviour."""
 
 ADDED_CONFIG_DEFAULTS: Dict[str, Any] = {
     "results.scale.normalize": {},
+    "solve.adiabatic": {},
 }
 """Config keys added in newer versions, with their default configuration."""
 

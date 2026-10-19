@@ -74,7 +74,8 @@ from mbstudio.ui.dialogs import (
     ask_question,
     show_about_dialog,
     show_critical,
-    show_information
+    show_information,
+    show_warning,
 )
 
 splash_message("Importing config packages / paths...")
@@ -200,6 +201,7 @@ class MBESolverApp(QMainWindow):
             get_params=self._parameter_tabs.get_value,
             on_state_solving=lambda: self._status_bar.set_state(StatusState.SOLVING, busy=True),
             on_state_ready=lambda: self._status_bar.set_state(StatusState.READY),
+            on_failed=lambda message: show_warning("Cannot Solve", message, parent=self),
         )
 
         self._pipeline = UpdatePipeline(
