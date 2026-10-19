@@ -4,6 +4,10 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.6.1 — 2026-10-19
+- On/off options ("Adiabatic (rate equations)", "Normalize to max") start at the left
+  edge of their group, with the formula right after the text (sciwidgets 0.11.4).
+
 ## 10.6.0 — 2026-10-19
 - New option **Adiabatic (rate equations)** on the Solver tab: the coherence follows
   its steady state, R = R₀ − T₂ A w, and only w and A are solved. Useful when T₂ is short;
