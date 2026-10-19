@@ -12,7 +12,7 @@ A PySide6 desktop application for simulating, visualizing, and fitting one-dimen
 ## Features
 
 - Interactive GUI for Maxwell-Bloch model configuration and visualization.
-- Numba-accelerated numerical solver using Runge-Kutta time stepping, from the [mbsolver](https://github.com/vahid-anari/mbsolver) package.
+- Numba-accelerated numerical solver using Runge-Kutta time stepping, from the [mbsolver](https://github.com/vahid-anari/mbsolver) package, with an optional adiabatic (rate-equation) limit.
 - Interface built with [sciwidgets](https://github.com/vahid-anari/sciwidgets) (sliders, parameter panels, plot canvas).
 - Light-curve import from velocity-tagged text files.
 - Support for period-tagged source folders, e.g. multiple folded periods for the same source.

@@ -4,7 +4,16 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
-## Unreleased
+## 10.6.0 — 2026-10-19
+- New option **Adiabatic (rate equations)** on the Solver tab: the coherence follows
+  its steady state, R = R₀ − T₂ A w, and only w and A are solved. Useful when T₂ is short;
+  it differs from the full model during the first few T₂ and in fast bursts. It needs a
+  finite T₂. Parameter files from earlier versions open with it off (the full model).
+- The Grid tab is now called **Solver**.
+- When the solver rejects the parameters (for example T₂ = ∞ with the adiabatic option),
+  a "Cannot Solve" message appears and the previous results stay shown; before, the app
+  could stay in the Solving state.
+- Needs mbsolver 0.5 (was 0.3).
 - The equations reference is now mbsolver's two-level model document
   (`docs/two_level.pdf`), with a section mapping symbols to the solver's
   arguments and a list of references. Its LaTeX source moved to mbsolver;

@@ -34,7 +34,7 @@ class SolverWorker(QObject):
 
         try:
             result = solve_maxwell_bloch(self._params)
-        except (ValueError, ImportError) as e:
+        except ValueError as e:
             self.failed.emit(str(e))
             return
         self.finished.emit(result)

@@ -31,6 +31,8 @@ params = f.params()           # a fresh dict each time, safe to change
 #   "solve.t1", "solve.t2"
 #                        a number, or steps {"symmetric", "y", "x0", "w", "wl", "wr"}
 #                        (the first entry of x0 and of the widths is not used)
+#   "solve.adiabatic"    True: adiabatic (rate-equation) limit, R = R0 - T2 A w
+#                        (needs a finite T2); False or missing: full model
 #   "slice.z"            {"arr_length": number of stored z planes, ...}
 # Other keys (display.*, data.*, results.*) belong to the window and are not used.
 

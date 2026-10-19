@@ -1,4 +1,4 @@
-"""Tests for the temporary adiabatic (rate-equation) solver switch, ``"solve.adiabatic"``."""
+"""Tests for the adiabatic (rate-equation) solver switch, ``"solve.adiabatic"``."""
 
 import json
 import math
@@ -10,12 +10,6 @@ import pytest
 import mbstudio
 from mbstudio.app.solver_adapter import solve_maxwell_bloch
 from mbstudio.io.legacy_keys import migrate_legacy_params
-
-pytest.importorskip("mbsolver.two_level", reason="mbsolver missing")
-from mbsolver import two_level  # noqa: E402
-
-pytestmark = pytest.mark.skipif(not hasattr(two_level, "solve_1d_adiabatic"),
-                                reason="needs mbsolver from the adiabatic branch")
 
 PLAIN = Path(__file__).parent / "data" / "params_plain.json"
 

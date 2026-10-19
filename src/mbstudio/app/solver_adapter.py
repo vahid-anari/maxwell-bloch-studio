@@ -13,7 +13,7 @@ from typing import Any, Mapping, Optional, Union
 
 import numpy as np
 from mbsolver import Pulse, Steps
-from mbsolver.two_level import solve_1d
+from mbsolver.two_level import solve_1d, solve_1d_adiabatic
 
 from mbstudio.sample import sample_scaling
 
@@ -50,10 +50,7 @@ def solve_maxwell_bloch(params: Mapping[str, Any]) -> dict[str, np.ndarray]:
         Mapping with ``time``, ``intensity``, ``w``, ``lambda_n`` (pump),
         ``A0`` (boundary field) and ``t1``, ``t2`` on the time grid.
     """
-    solver = solve_1d
-    if params.get("solve.adiabatic", False):
-        # Temporary: only in the editable mbsolver on the ``adiabatic`` branch.
-        from mbsolver.two_level import solve_1d_adiabatic as solver
+    solver = solve_1d_adiabatic if params.get("solve.adiabatic", False) else solve_1d
 
     derived = sample_scaling(params["solve.sample"])
     ics = params["solve.ics"]
