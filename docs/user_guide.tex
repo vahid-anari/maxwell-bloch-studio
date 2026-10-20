@@ -520,7 +520,7 @@ observed flux with the model, and the time axis is in days.
 
 To enter fit mode:
 \begin{enumerate}[noitemsep]
-  \item choose \menu{File $\to$ Open Data Folder...} (\key{Ctrl+Shift+O}),
+  \item choose \menu{File $\to$ Open Data Folder...} (\key{Ctrl+O}),
   \item select the folder containing the data files,
   \item if more than one period group is present, choose the desired period,
   \item review the import summary dialog.
@@ -603,9 +603,9 @@ The shortcuts below use Windows/Linux conventions. On macOS, replace \key{Ctrl} 
   \toprule
   Menu Item & Shortcut & Description \\
   \midrule
-  Open Data Folder...        & \key{Ctrl+Shift+O} & Import a data folder and enter fit mode \\
+  Open Data Folder...        & \key{Ctrl+O}       & Import a data folder and enter fit mode \\
   Recent Data Folders        & ---                & Reopen a recently used source folder \\
-  Open Current Source Folder & \key{Ctrl+O}       & Open the active source folder in the file browser \\
+  Open Current Source Folder & \key{Ctrl+Alt+O}   & Open the active source folder in the file browser \\
   Open Parameters...         & \key{Ctrl+Shift+P} & Import a standalone parameter snapshot \\
   Close Data                 & \key{Ctrl+W}       & Close the loaded data folder \\
   Save Parameters            & \key{Ctrl+S}       & Save current parameters \\
@@ -647,15 +647,16 @@ Grid lines, curve colours, line styles and the span style are set from the plot'
   \toprule
   Menu Item & Shortcut & Description \\
   \midrule
-  Data Summary        & \key{Ctrl+Alt+D} & Show source, period, velocity, and data ranges \\
+  \multicolumn{3}{@{}l}{\textit{Info}} \\
+  Data Summary        & \key{Ctrl+I}     & Show source, period, velocity, and data ranges \\
   Scaling Formula     & \key{Ctrl+Alt+F} & Show the scaling expression used by the app \\
-  Equations Reference & \key{Ctrl+Alt+E} & Open the bundled equations reference PDF \\
   Solver Step Viewer  & \key{Ctrl+Alt+V} & Open the interactive solver-step viewer \\
-  User Guide          & \key{F1}         & Open the user guide PDF if available \\
+  \multicolumn{3}{@{}l}{\textit{Help}} \\
+  User Guide          & \key{F1} (\key{Cmd+?} on macOS) & Open this guide \\
+  Equations Reference & \key{Ctrl+Alt+E} & Open the bundled equations reference PDF \\
   Use from Python     & ---              & Show the example script for your own scripts \\
-  Check for Updates   & ---              & Ask PyPI whether a newer version exists \\
-  About This App      & ---              & Show application and author information \\
-  About Qt            & ---              & Show the Qt about dialog \\
+  Check for Updates   & \key{Ctrl+U}     & Ask PyPI whether a newer version exists \\
+  About Maxwell Bloch Studio & ---       & Version, links, and the libraries the app is built on \\
   \bottomrule
 \end{tabular}
 \end{center}

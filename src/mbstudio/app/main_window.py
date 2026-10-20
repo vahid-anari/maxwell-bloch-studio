@@ -15,7 +15,6 @@ import getpass
 import sys
 from dataclasses import dataclass
 from datetime import datetime
-from html import escape
 from pathlib import Path
 from typing import Any, Dict, Optional
 import numpy as np
@@ -45,7 +44,7 @@ splash_message("Importing config packages / velocity bar...")
 from mbstudio.app.velocity_bar_controller import VelocityBarController
 
 splash_message("Importing config packages / update checker...")
-from sciwidgets.app.update_ui import AppUpdates
+from sciwidgets.app.help import AppHelp, Document
 
 splash_message("Importing config packages / data I/O...")
 from mbstudio.io.data_io import (
@@ -72,7 +71,6 @@ splash_message("Importing config packages / dialogs...")
 from mbstudio.ui.dialogs import (
     AskResult,
     ask_question,
-    show_about_dialog,
     show_critical,
     show_information,
     show_warning,
@@ -81,11 +79,7 @@ from mbstudio.ui.dialogs import (
 splash_message("Importing config packages / paths...")
 from mbstudio.paths import EQUATIONS_PDF_PATH, SETTINGS_FILE_PATH, USER_GUIDE_PATH
 from mbstudio.config.app_metadata import (
-    APP_AUTHOR_EMAIL,
-    APP_AUTHOR_GITHUB,
     APP_AUTHOR_NAME,
-    APP_AUTHOR_WEBSITE,
-    APP_NAME,
     APP_VERSION,
     APP,
 )
@@ -226,7 +220,12 @@ class MBESolverApp(QMainWindow):
         )
 
         # update check, notice, Update Now and restart (sciwidgets.app)
-        self._updates = AppUpdates(self, APP, success_note="Unsaved parameters are asked about as usual.")
+        self._help = AppHelp(
+            self, APP, user_guide=USER_GUIDE_PATH, author=APP_AUTHOR_NAME,
+            documents=[Document("Equations Reference", EQUATIONS_PDF_PATH, "Ctrl+Alt+E")],
+            missing_hint="From a clone, build it with sh tools/build_docs.sh.",
+            success_note="Unsaved parameters are asked about as usual.",
+        )
 
         # ---- menu bar (needs coordinator objects ready) ----
         menu_spec = self._build_menu_spec()
@@ -262,7 +261,7 @@ class MBESolverApp(QMainWindow):
         self._status_bar.set_modified()
         self._on_bottom_plot_changed()
         QTimer.singleShot(0, self._solver.solve)
-        QTimer.singleShot(2000, self._updates.check)
+        QTimer.singleShot(2000, self._help.updates.check)
 
     # ---- Layout ----
     def _make_layout(self) -> None:
@@ -557,10 +556,10 @@ class MBESolverApp(QMainWindow):
         """
         return {
             "File": [
-                {"id": "open_data_folder", "text": "Open Data Folder...", "shortcut": "Ctrl+Shift+O"},
+                {"id": "open_data_folder", "text": "Open Data Folder...", "shortcut": "Ctrl+O"},
                 {"id": "recent_data_folders_menu", "submenu": "Recent Data Folders",
                  "items": self._settings.recent_folders.build_menu_items()},
-                {"id": "open_source_folder", "text": "Open Current Source Folder", "shortcut": "Ctrl+O"},
+                {"id": "open_source_folder", "text": "Open Current Source Folder", "shortcut": "Ctrl+Alt+O"},
                 {"id": "open_parameters", "text": "Open Parameters...", "shortcut": "Ctrl+Shift+P"},
                 {"id": "close_data", "text": "Close Data", "shortcut": QKeySequence.Close},
                 {"id": "sep"},
@@ -580,21 +579,19 @@ class MBESolverApp(QMainWindow):
                 {"id": "reset_plot_style", "text": "Reset Plot Style"},
             ],
             "Info": [
-                {"id": "show_data_summary", "text": "Data Summary", "shortcut": "Ctrl+Alt+D"},
+                {"id": "show_data_summary", "text": "Data Summary", "shortcut": "Ctrl+I"},
                 {"id": "show_scaling_formula", "text": "Scaling Formula", "shortcut": "Ctrl+Alt+F"},
-                {"id": "open_equations_pdf", "text": "Equations Reference", "shortcut": "Ctrl+Alt+E"},
                 {"id": "open_solver_step_viewer", "text": "Solver Step Viewer", "shortcut": "Ctrl+Alt+V"},
             ],
-            "Help": [
-                {"id": "open_user_guide", "text": "User Guide", "shortcut": QKeySequence.HelpContents},
-                {"id": "show_python_example", "text": "Use from Python..."},
-                {"id": "sep"},
-                {"id": "check_for_updates", "text": "Check for Updates..."},
-                {"id": "sep"},
-                {"id": "show_about_dialog", "text": "About This App"},
-                {"id": "show_about_qt", "text": "About Qt"},
-            ],
+            "Help": self._help_menu_items(),
         }
+
+    def _help_menu_items(self) -> list[dict[str, Any]]:
+        """The shared Help menu (sciwidgets), with Use from Python... after the documents."""
+        items = self._help.menu_items()
+        first_sep = next(i for i, item in enumerate(items) if item.get("id") == "sep")
+        items.insert(first_sep, {"id": "show_python_example", "text": "Use from Python..."})
+        return items
 
     def _capture_menu_check_states(self) -> dict[str, bool]:
         """Capture checked states of persistent menu actions before a rebuild.
@@ -642,13 +639,8 @@ class MBESolverApp(QMainWindow):
             "quit_application": lambda: QApplication.instance().quit(),
             "show_scaling_formula": self._parameter_tabs.show_scaling_formula,
             "show_data_summary": self._show_data_information,
-            "open_equations_pdf": self._open_equations_pdf,
             "open_solver_step_viewer": self._open_solver_step_viewer,
-            "open_user_guide": self._open_user_guide,
-            "check_for_updates": self._check_for_updates_manually,
             "show_python_example": self._show_python_example,
-            "show_about_dialog": self._show_about_dialog,
-            "show_about_qt": self._show_about_qt,
             "reset_plot_style": self._reset_plot_style,
         }
 
@@ -981,10 +973,6 @@ class MBESolverApp(QMainWindow):
         text += f"Flux Range: [{flux_min}, {flux_max}]\n"
         show_information("Data Summary", text, parent=self)
 
-    def _open_equations_pdf(self) -> None:
-        """Open the local equations reference PDF."""
-        self._open_path(EQUATIONS_PDF_PATH, "Equations Reference", "equations_reference.pdf not found")
-
     def _open_solver_step_viewer(self) -> None:
         """Open or raise the interactive solver step-viewer window."""
         if self._step_viewer_window is None:
@@ -1005,48 +993,11 @@ class MBESolverApp(QMainWindow):
         self._step_viewer_window = None
 
     # ---- Help menu ----
-    def _open_user_guide(self) -> None:
-        """Open the user guide PDF."""
-        self._open_path(USER_GUIDE_PATH, "User Guide", "user_guide.pdf not found.")
-
     def _show_python_example(self) -> None:
         """Show the example script for using the solver from Python."""
         from mbstudio.ui.python_example import PythonExampleDialog
 
         PythonExampleDialog(self).exec()
-
-    def _show_about_dialog(self) -> None:
-        """Show the application About dialog with version and author information."""
-        lines = [f"<b>Version:</b> {escape(APP_VERSION)}"]
-        if APP_AUTHOR_NAME:
-            lines.append(f"<b>Created by:</b> {escape(APP_AUTHOR_NAME)}")
-        if APP_AUTHOR_EMAIL:
-            email = escape(APP_AUTHOR_EMAIL)
-            lines.append(f'<b>Email:</b> <a href="mailto:{email}">{email}</a>')
-        if APP_AUTHOR_GITHUB:
-            github = escape(APP_AUTHOR_GITHUB)
-            lines.append(f'<b>GitHub:</b> <a href="{github}">{github}</a>')
-        if APP_AUTHOR_WEBSITE:
-            website = escape(APP_AUTHOR_WEBSITE)
-            lines.append(f'<b>Website:</b> <a href="{website}">{website}</a>')
-        show_about_dialog(
-            title=f"About {APP_NAME}",
-            heading=APP_NAME,
-            html_text="<br>".join(lines),
-            parent=self,
-        )
-
-    def _show_about_qt(self) -> None:
-        """Show the built-in Qt About dialog."""
-        QApplication.aboutQt()
-
-    # ------------------------------------------------------------------
-    # Update check
-    # ------------------------------------------------------------------
-    def _check_for_updates_manually(self) -> None:
-        """Run an update check from the Help menu and report every outcome."""
-
-        self._updates.check(manual=True)
 
     # ---- Signal handlers ----
     def _on_menu_action_triggered(self, _menu_id: str, action_id: str, checked: bool) -> None:
@@ -1057,6 +1008,8 @@ class MBESolverApp(QMainWindow):
             action_id: Triggered action identifier.
             checked: Checked state associated with the action.
         """
+        if self._help.handle(action_id):
+            return
         if action_id in self._settings.recent_folders.action_map:
             self._open_recent_data_folder(self._settings.recent_folders.action_map[action_id])
             return

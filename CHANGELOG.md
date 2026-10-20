@@ -4,6 +4,17 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.7.0 — 2026-10-19
+- The Help menu is now the same in all of the author's apps (Maxwell Bloch Studio, Line Catalog
+  Explorer, daftarche): User Guide, Equations Reference (moved here from the Info menu),
+  Use from Python..., Check for Updates… (new shortcut Ctrl+U / ⌘U) and About.
+- About lists the libraries the app is built on, with their versions and licenses, including
+  Qt; the separate "About Qt" item is gone.
+- Shortcuts: Open Data Folder... is now Ctrl+O / ⌘O (the usual "Open"), Open Current Source
+  Folder Ctrl+Alt+O / ⌥⌘O, and Data Summary Ctrl+I / ⌘I — on a Mac the old ⌥⌘D shows or hides
+  the Dock, so the app never received it.
+- Needs sciwidgets 0.12.
+
 ## 10.6.2 — 2026-10-19
 - When the solver refuses a change (for example T₂ = ∞ with the adiabatic option on, or
   ticking the option while T₂ is ∞), the changed setting now goes back to its previous
