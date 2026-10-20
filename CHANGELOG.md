@@ -4,6 +4,11 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.6.2 — 2026-10-19
+- When the solver refuses a change (for example T₂ = ∞ with the adiabatic option on, or
+  ticking the option while T₂ is ∞), the changed setting now goes back to its previous
+  value, so the panel always matches the plot; the message names the tab.
+
 ## 10.6.1 — 2026-10-19
 - On/off options ("Adiabatic (rate equations)", "Normalize to max") start at the left
   edge of their group, with the formula right after the text (sciwidgets 0.11.4).

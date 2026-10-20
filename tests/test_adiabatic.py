@@ -61,3 +61,29 @@ def test_worker_reports_the_refusal():
     worker.run()
     assert finished == []
     assert len(failed) == 1 and "t2 must be finite" in failed[0]
+
+
+def test_refused_values_are_found_for_restoring():
+    from mbstudio.app.solver_controller import changed_solve_values
+
+    good = _small_params(**{"solve.adiabatic": True})
+    refused = dict(good, **{"solve.t2": math.inf, "display.range.t2": [0.0, 1.0]})
+    assert changed_solve_values(refused, good) == {"solve.t2": good["solve.t2"]}
+    assert changed_solve_values(good, good) == {}
+    assert changed_solve_values(refused, {}) == {}
+
+
+def test_values_with_arrays_are_compared():
+    """Step and pulse values hold numpy arrays; comparing them must not raise."""
+    import numpy as np
+    from mbstudio.app.solver_controller import changed_solve_values, same_value
+
+    steps = {"symmetric": True, "y": np.array([8.0, 3.0]), "x0": np.array([0.0, 100.0]), "w": np.array([0.0, 5.0])}
+    other = dict(steps, y=np.array([8.0, np.inf]))
+    good = {"solve.t2": steps, "solve.t1": 2.0, "solve.adiabatic": True}
+    refused = {"solve.t2": other, "solve.t1": 2.0, "solve.adiabatic": True}
+    assert changed_solve_values(refused, good) == {"solve.t2": steps}
+    assert changed_solve_values(good, {k: (dict(v) if isinstance(v, dict) else v) for k, v in good.items()}) == {}
+    assert same_value([1.0, float("nan")], np.array([1.0, np.nan]))
+    assert not same_value(np.array([1.0, 2.0]), np.array([1.0, 2.0, 3.0]))
+    assert not same_value({"a": 1}, {"b": 1})

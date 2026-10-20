@@ -201,7 +201,7 @@ class MBESolverApp(QMainWindow):
             get_params=self._parameter_tabs.get_value,
             on_state_solving=lambda: self._status_bar.set_state(StatusState.SOLVING, busy=True),
             on_state_ready=lambda: self._status_bar.set_state(StatusState.READY),
-            on_failed=lambda message: show_warning("Cannot Solve", message, parent=self),
+            on_failed=self._on_solve_refused,
         )
 
         self._pipeline = UpdatePipeline(
@@ -530,6 +530,23 @@ class MBESolverApp(QMainWindow):
         """
         self._results = results
         self._pipeline.request(plot=True, current_span=True)
+
+    def _on_solve_refused(self, message: str, previous: dict) -> None:
+        """Put back the values of the last successful solve and explain why.
+
+        The panel's setters are silent, so restoring does not start another solve; the
+        plot keeps showing the results of exactly these values.
+
+        Args:
+            message: The solver's error message.
+            previous: ``{path: value}`` of the last successful solve that differ now.
+        """
+        text = message
+        if previous:
+            self._parameter_tabs.set_value(previous)
+            tabs = sorted({self._parameter_tabs.tab_title_of(path) for path in previous})
+            text += "\n\nThe previous setting was restored (" + ", ".join(tabs) + ")."
+        show_warning("Cannot Solve", text, parent=self)
 
     # ---- Menu spec & rebuild ----
     def _build_menu_spec(self) -> dict[str, Any]:

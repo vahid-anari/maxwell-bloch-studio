@@ -6,12 +6,52 @@ overlapping solves.
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
+
+import numpy as np
 from shiboken6 import isValid
 
 from PySide6.QtCore import QObject, QThread, Signal
 
 from mbstudio.app.solver_adapter import solve_maxwell_bloch
+
+
+def same_value(a: Any, b: Any) -> bool:
+    """Whether two parameter values are equal, looking inside dicts, lists and numpy arrays.
+
+    A plain ``==`` fails on widget values that hold numpy arrays (the step and pulse
+    widgets), because comparing arrays gives an array, not a bool.
+    """
+    if isinstance(a, Mapping) and isinstance(b, Mapping):
+        return a.keys() == b.keys() and all(same_value(a[k], b[k]) for k in a)
+    if isinstance(a, (np.ndarray, list, tuple)) or isinstance(b, (np.ndarray, list, tuple)):
+        try:
+            return bool(np.array_equal(np.asarray(a), np.asarray(b), equal_nan=True))
+        except TypeError:
+            return bool(np.array_equal(np.asarray(a, dtype=object), np.asarray(b, dtype=object)))
+    try:
+        return bool(a == b) or (a != a and b != b)  # NaN equals NaN here
+    except (TypeError, ValueError):
+        return False
+
+
+def changed_solve_values(current: Mapping[str, Any], previous: Mapping[str, Any]) -> dict[str, Any]:
+    """Return the solver parameters (``solve.*``) whose value differs from ``previous``.
+
+    Used after a refused solve to put back the values of the last successful solve.
+
+    Args:
+        current: Parameter mapping that was refused.
+        previous: Parameter mapping of the last successful solve.
+
+    Returns:
+        ``{path: previous value}`` for every ``solve.*`` path that changed.
+    """
+    return {
+        path: value
+        for path, value in previous.items()
+        if path.startswith("solve.") and not same_value(current.get(path), value)
+    }
 
 
 class SolverWorker(QObject):
@@ -60,7 +100,7 @@ class SolverController(QObject):
         get_params: Callable[[], dict[str, Any]],
         on_state_solving: Callable[[], None],
         on_state_ready: Callable[[], None],
-        on_failed: Callable[[str], None] | None = None,
+        on_failed: Callable[[str, dict[str, Any]], None] | None = None,
     ) -> None:
         """Initialize the solver controller.
 
@@ -71,8 +111,10 @@ class SolverController(QObject):
             get_params: Callable returning the current parameter snapshot to solve.
             on_state_solving: Callback invoked on the main thread when a solve starts.
             on_state_ready: Callback invoked on the main thread when a solve finishes.
-            on_failed: Callback invoked on the main thread with the message when the
-                solver rejects the parameters (the previous results stay shown).
+            on_failed: Callback invoked on the main thread when the solver rejects the
+                parameters, with the message and the ``solve.*`` values of the last
+                successful solve that differ from the refused ones (empty if there was
+                none); the previous results stay shown.
         """
         super().__init__(parent)
         self._on_finished = on_finished
@@ -84,6 +126,7 @@ class SolverController(QObject):
         self._is_solving = False
         self._has_pending = False
         self._current_params: dict[str, Any] = {}
+        self._last_good_params: dict[str, Any] = {}
         self._thread: QThread | None = None
         self._worker: SolverWorker | None = None
         self._shutting_down = False
@@ -158,6 +201,7 @@ class SolverController(QObject):
             result: Result dictionary emitted by the worker.
         """
         self._is_solving = False
+        self._last_good_params = self._current_params
         self._on_state_ready()
         self._on_finished(result)
 
@@ -170,7 +214,7 @@ class SolverController(QObject):
         self._is_solving = False
         self._on_state_ready()
         if self._on_failed is not None and not self._has_pending:
-            self._on_failed(message)
+            self._on_failed(message, changed_solve_values(self._current_params, self._last_good_params))
 
     def _handle_thread_finished(self) -> None:
         """Drop references to the finished thread and start any queued solve."""

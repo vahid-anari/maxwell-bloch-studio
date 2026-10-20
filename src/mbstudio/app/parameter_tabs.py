@@ -98,6 +98,14 @@ class ParameterTabsWidget(ParameterTabs):
         """Return all configurations as ``{path: config}``, sorted by path."""
         return dict(sorted(super().get_config().items()))
 
+    def tab_title_of(self, path: str) -> str:
+        """Return the title of the tab that holds ``path`` (the path itself if none does)."""
+        for tab_id in self.tab_ids():
+            page = self.page(tab_id)
+            if path in page.paths():
+                return self.tabText(self.indexOf(page))
+        return path
+
     # ----- MB-specific -----
     def set_fit_tab_enable(self, enabled: bool) -> None:
         """Enable or disable the contents of the Fit tab (the tab stays selectable).
