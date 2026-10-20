@@ -6,8 +6,20 @@ authors:
   - family-names: Anari
     given-names: Vahid
     orcid: "https://orcid.org/0000-0002-2464-3989"
-version: 10.7.1
+version: 10.7.2
 date-released: "2026-10-19"
 license: MIT
 repository-code: "https://github.com/vahid-anari/maxwell-bloch-studio"
 url: "https://pypi.org/project/maxwell-bloch-studio/"
+abstract: >-
+  Desktop application for interactive Maxwell-Bloch modelling of astronomical
+  masers and superradiance: set the sample, pump, relaxation times and boundary
+  field with sliders, see the light curve update, and fit observed maser flux
+  data. The numerical solver is mbsolver (doi:10.5281/zenodo.23407483).
+keywords:
+  - Maxwell-Bloch equations
+  - masers
+  - superradiance
+  - astrophysics
+  - light curves
+  - PySide6
