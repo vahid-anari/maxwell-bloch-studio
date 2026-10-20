@@ -15,6 +15,7 @@ import getpass
 import sys
 from dataclasses import dataclass
 from datetime import datetime
+from html import escape
 from pathlib import Path
 from typing import Any, Dict, Optional
 import numpy as np
@@ -224,6 +225,14 @@ class MBESolverApp(QMainWindow):
             self, APP, user_guide=USER_GUIDE_PATH, author=APP_AUTHOR_NAME,
             documents=[Document("Equations Reference", EQUATIONS_PDF_PATH, "Ctrl+Alt+E")],
             missing_hint="From a clone, build it with sh tools/build_docs.sh.",
+            citation=(
+                f"Anari, V. <i>Maxwell Bloch Studio</i>, version {escape(APP_VERSION)}. "
+                '<a href="https://github.com/vahid-anari/maxwell-bloch-studio">'
+                "github.com/vahid-anari/maxwell-bloch-studio</a><br>"
+                "and the solver it runs on: Anari, V., &amp; Rashidi, T. <i>mbsolver: Fast Maxwell-Bloch "
+                "solvers for masers, superradiance and coherent pulse propagation</i>. Zenodo. "
+                '<a href="https://doi.org/10.5281/zenodo.23407483">doi:10.5281/zenodo.23407483</a>'
+            ),
             success_note="Unsaved parameters are asked about as usual.",
         )
 

@@ -4,6 +4,10 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.7.1 — 2026-10-19
+- About asks you to cite the app and the solver it runs on (mbsolver, with its DOI) if you use
+  them in published work (sciwidgets 0.12.1).
+
 ## 10.7.0 — 2026-10-19
 - The Help menu is now the same in all of the author's apps (Maxwell Bloch Studio, Line Catalog
   Explorer, daftarche): User Guide, Equations Reference (moved here from the Info menu),
