@@ -158,7 +158,8 @@ Plots can be exported from the GUI as:
 - PNG
 - SVG
 
-PDF exports include the plot plus a report page containing metadata and the current parameter state.
+PDF exports include the plot plus a report page with how to cite the results (Maxwell Bloch Studio and
+mbsolver, with versions and DOIs), metadata and the current parameter state.
 
 ## Documentation
 

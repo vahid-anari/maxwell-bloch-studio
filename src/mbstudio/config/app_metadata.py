@@ -48,6 +48,29 @@ APP_AUTHOR_GITHUB = f"https://github.com/{GITHUB_REPO}"
 APP_AUTHOR_WEBSITE = ""
 """Author website URL, if available."""
 
+STUDIO_DOI = "10.5281/zenodo.23487624"
+"""Zenodo DOI of Maxwell Bloch Studio (all versions; resolves to the latest)."""
+
+MBSOLVER_DOI = "10.5281/zenodo.23407483"
+"""Zenodo DOI of mbsolver, the solver the app runs on (all versions)."""
+
+
+def _mbsolver_version() -> str:
+    try:
+        return version("mbsolver")
+    except PackageNotFoundError:
+        return "?"
+
+
+def citation_references() -> list[str]:
+    """The references to cite for results made with the app: Studio and mbsolver (plain text)."""
+    return [
+        f"Anari, V. Maxwell Bloch Studio: a desktop application for Maxwell-Bloch models of "
+        f"astronomical masers, version {APP_VERSION}. Zenodo. https://doi.org/{STUDIO_DOI}",
+        f"Anari, V., & Rashidi, T. mbsolver: Fast Maxwell-Bloch solvers for masers, superradiance "
+        f"and coherent pulse propagation, version {_mbsolver_version()}. Zenodo. https://doi.org/{MBSOLVER_DOI}",
+    ]
+
 def _app_info():
     from sciwidgets.app import AppInfo
 

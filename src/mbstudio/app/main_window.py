@@ -83,6 +83,8 @@ from mbstudio.config.app_metadata import (
     APP_AUTHOR_NAME,
     APP_VERSION,
     APP,
+    MBSOLVER_DOI,
+    STUDIO_DOI,
 )
 
 splash_message("Importing config packages / style...")
@@ -227,10 +229,10 @@ class MBESolverApp(QMainWindow):
             missing_hint="From a clone, build it with sh tools/build_docs.sh.",
             citation=(
                 f"Anari, V. <i>Maxwell Bloch Studio</i>, version {escape(APP_VERSION)}. Zenodo. "
-                '<a href="https://doi.org/10.5281/zenodo.23487624">doi:10.5281/zenodo.23487624</a><br>'
+                f'<a href="https://doi.org/{STUDIO_DOI}">doi:{STUDIO_DOI}</a><br>'
                 "and the solver it runs on: Anari, V., &amp; Rashidi, T. <i>mbsolver: Fast Maxwell-Bloch "
                 "solvers for masers, superradiance and coherent pulse propagation</i>. Zenodo. "
-                '<a href="https://doi.org/10.5281/zenodo.23407483">doi:10.5281/zenodo.23407483</a>'
+                f'<a href="https://doi.org/{MBSOLVER_DOI}">doi:{MBSOLVER_DOI}</a>'
             ),
             success_note="Unsaved parameters are asked about as usual.",
         )

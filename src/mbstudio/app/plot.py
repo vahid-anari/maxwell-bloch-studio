@@ -22,7 +22,7 @@ from matplotlib.transforms import ScaledTranslation
 from matplotlib.backends.backend_pdf import PdfPages
 
 from sciwidgets.plot import PlotCanvas as _SciPlotCanvas
-from mbstudio.config.app_metadata import APP_NAME
+from mbstudio.config.app_metadata import APP_NAME, citation_references
 from mbstudio.config.app_style import EXPORT_PLOT_PAD_INCHES, USE_LATEX
 from mbstudio.utils.helper_funcs import cut_y_by_x, get_range, pretty_json
 
@@ -157,7 +157,12 @@ class PlotExporter:
         """
         metadata = self._get_metadata()
         params = self._get_parameter_tabs_value()
+        refs = citation_references()
         parts = [
+            "How to cite", "===========",
+            "If you use these results in published work, please cite:", "",
+            *(textwrap.fill(ref, width=100, initial_indent=f"  [{i}] ", subsequent_indent="      ")
+              for i, ref in enumerate(refs, start=1)), "",
             "Metadata", "========", pretty_json(metadata), "",
             "Parameters", "==========", pretty_json(params),
         ]
