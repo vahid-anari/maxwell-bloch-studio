@@ -4,6 +4,10 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.7.3 — 2026-10-19
+- Maxwell Bloch Studio has its own DOI, 10.5281/zenodo.23487624 (all versions): About, the
+  README and `CITATION.cff` cite it, next to mbsolver's.
+
 ## 10.7.2 — 2026-10-19
 - No changes in the app. First release archived on Zenodo, which gives Maxwell Bloch Studio a
   citable DOI; `CITATION.cff` has an abstract and keywords for it.

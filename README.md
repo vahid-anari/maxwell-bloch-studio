@@ -3,6 +3,7 @@
 [![tests](https://github.com/vahid-anari/maxwell-bloch-studio/actions/workflows/tests.yml/badge.svg)](https://github.com/vahid-anari/maxwell-bloch-studio/actions/workflows/tests.yml)
 [![PyPI](https://img.shields.io/pypi/v/maxwell-bloch-studio)](https://pypi.org/project/maxwell-bloch-studio/)
 [![Python](https://img.shields.io/pypi/pyversions/maxwell-bloch-studio)](https://pypi.org/project/maxwell-bloch-studio/)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23487624-blue)](https://doi.org/10.5281/zenodo.23487624)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 A PySide6 desktop application for simulating, visualizing, and fitting one-dimensional Maxwell-Bloch models to astronomical maser light-curve data. The application combines an interactive Qt interface, configurable physical and numerical parameters, Numba-accelerated time evolution, and publication-oriented plotting/export tools.
@@ -222,10 +223,19 @@ scripts, change `import mbsolver` to `import mbstudio`.
 
 ## Citing
 
-If you use Maxwell Bloch Studio in published work, please cite it; GitHub's
-**Cite this repository** button gives the reference (from `CITATION.cff`).
-For the numerical solver itself, cite [mbsolver](https://github.com/vahid-anari/mbsolver#citing)
-(DOI [10.5281/zenodo.23407483](https://doi.org/10.5281/zenodo.23407483)).
+If you use Maxwell Bloch Studio in published work, please cite it and the solver
+it runs on:
+
+> Anari, V. *Maxwell Bloch Studio: a desktop application for Maxwell-Bloch models
+> of astronomical masers*. Zenodo. https://doi.org/10.5281/zenodo.23487624
+
+> Anari, V., & Rashidi, T. *mbsolver: Fast Maxwell-Bloch solvers for masers,
+> superradiance and coherent pulse propagation*. Zenodo.
+> https://doi.org/10.5281/zenodo.23407483
+
+These DOIs always point to the latest version; each release also has its own DOI on
+Zenodo, for citing the exact version you used. GitHub's **Cite this repository**
+button gives the reference in other formats (from `CITATION.cff`).
 
 ## License
 

@@ -226,9 +226,8 @@ class MBESolverApp(QMainWindow):
             documents=[Document("Equations Reference", EQUATIONS_PDF_PATH, "Ctrl+Alt+E")],
             missing_hint="From a clone, build it with sh tools/build_docs.sh.",
             citation=(
-                f"Anari, V. <i>Maxwell Bloch Studio</i>, version {escape(APP_VERSION)}. "
-                '<a href="https://github.com/vahid-anari/maxwell-bloch-studio">'
-                "github.com/vahid-anari/maxwell-bloch-studio</a><br>"
+                f"Anari, V. <i>Maxwell Bloch Studio</i>, version {escape(APP_VERSION)}. Zenodo. "
+                '<a href="https://doi.org/10.5281/zenodo.23487624">doi:10.5281/zenodo.23487624</a><br>'
                 "and the solver it runs on: Anari, V., &amp; Rashidi, T. <i>mbsolver: Fast Maxwell-Bloch "
                 "solvers for masers, superradiance and coherent pulse propagation</i>. Zenodo. "
                 '<a href="https://doi.org/10.5281/zenodo.23407483">doi:10.5281/zenodo.23407483</a>'
