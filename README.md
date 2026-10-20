@@ -239,4 +239,5 @@ Vahid Anari ·
 
 Related projects: [mbsolver](https://github.com/vahid-anari/mbsolver) ·
 [sciwidgets](https://github.com/vahid-anari/sciwidgets) ·
-[linecat](https://github.com/vahid-anari/linecat)
+[linecat](https://github.com/vahid-anari/linecat) ·
+[Daftarche](https://github.com/vahid-anari/daftarche)
