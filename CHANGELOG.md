@@ -4,6 +4,10 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.7.5 — 2026-10-19
+- Help → Check for Updates… chosen while the automatic check at start-up was still running no
+  longer shows the update notice twice (sciwidgets 0.12.2).
+
 ## 10.7.4 — 2026-10-19
 - PDF exports: the report page starts with "How to cite", the references of Maxwell Bloch
   Studio and mbsolver with their versions and DOIs.
