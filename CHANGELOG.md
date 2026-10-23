@@ -4,12 +4,16 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.9.1 — 2026-10-23
+- Dark mode: menu separators and the edges of input fields are visible, and disabled values are
+  easier to read (sciwidgets 0.14.2).
+
 ## 10.9.0 — 2026-10-22
 - Dark mode: View → Appearance → Same as System, Light or Dark (remembered). The whole window, the
   plot and the parameter panels follow; curve colours too dark for the dark plot are drawn lighter,
   and the plot's style dialogs offer an own colour for dark mode. Exported plots (PNG, SVG) and PDF
   reports always use the light colours. The "Use from Python" example has dark syntax colours.
-- Requires sciwidgets 0.14.1.
+- Requires sciwidgets 0.14.0.
 - `tools/figures.py` (repo only) retakes the README and User Guide pictures and the new `tour.gif`.
 
 ## 10.8.0 — 2026-10-22
