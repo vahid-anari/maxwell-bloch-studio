@@ -33,7 +33,7 @@ splash_message("Importing config packages / plot...")
 from mbstudio.app.plot import PlotCanvas, PlotExporter
 
 splash_message("Importing config packages / settings manager...")
-from mbstudio.app.settings_manager import Settings
+from mbstudio.app.settings_manager import APPEARANCES, Settings
 
 splash_message("Importing config packages / solver...")
 from mbstudio.app.solver_controller import SolverController
@@ -95,6 +95,7 @@ splash_message("Importing config packages / menu bar...")
 splash_message("Importing config packages / status bar...")
 from enum import Enum
 from sciwidgets.plot import CurveSelector
+from sciwidgets.style import set_color_scheme
 from sciwidgets.window import MenuBarController, StatusBarController
 
 splash_message("Importing config packages / helper functions...")
@@ -191,6 +192,7 @@ class MBESolverApp(QMainWindow):
             organization="VahidAnari",
             application="MaxwellBlochSolver",  # name before 10.0; kept so saved settings stay
         )
+        set_color_scheme(app, self._settings.get_appearance())
 
         self._solver = SolverController(
             parent=self,
@@ -588,6 +590,11 @@ class MBESolverApp(QMainWindow):
             "View": [
                 {"id": "show_slider_range_labels", "text": "Show Slider Range",
                  "checkable": True, "checked": False, "shortcut": "Ctrl+Alt+R"},
+                {"id": "appearance", "submenu": "Appearance", "items": [
+                    {"id": f"appearance_{scheme}", "text": text, "checkable": True,
+                     "checked": scheme == self._settings.get_appearance()}
+                    for scheme, text in (("system", "Same as System"), ("light", "Light"), ("dark", "Dark"))
+                ]},
                 {"id": "sep"},
                 {"id": "reset_plot_style", "text": "Reset Plot Style"},
             ],
@@ -1023,6 +1030,9 @@ class MBESolverApp(QMainWindow):
         """
         if self._help.handle(action_id):
             return
+        if action_id.startswith("appearance_"):
+            self._set_appearance(action_id.removeprefix("appearance_"))
+            return
         if action_id in self._settings.recent_folders.action_map:
             self._open_recent_data_folder(self._settings.recent_folders.action_map[action_id])
             return
@@ -1031,6 +1041,17 @@ class MBESolverApp(QMainWindow):
             handler()
             return
         self._handle_checkable_menu_action(action_id, checked)
+
+    def _set_appearance(self, scheme: str) -> None:
+        """Show the app in the system's colours, or always light or dark, and remember the choice.
+
+        Args:
+            scheme: ``"system"``, ``"light"`` or ``"dark"``.
+        """
+        set_color_scheme(QApplication.instance(), scheme)
+        self._settings.set_appearance(scheme)
+        for name in APPEARANCES:
+            self._menu_bar.set_checked(f"appearance_{name}", name == scheme)
 
     def _on_velocity_changed(self, velocity: str) -> None:
         """Handle a change in the selected velocity component.

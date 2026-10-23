@@ -7,6 +7,7 @@
       ],
       "dpi": 100,
       "facecolor": "floralwhite",
+      "dark_facecolor": "#2b2a27",
       "edgecolor": "k",
       "margins": {
         "left": 0.06,

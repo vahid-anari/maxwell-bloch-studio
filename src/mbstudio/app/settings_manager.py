@@ -34,6 +34,12 @@ VIEW_PREFERENCE_KEYS = {
 }
 """Map view-action identifiers to their persisted QSettings keys."""
 
+APPEARANCE_KEY = "view/appearance"
+"""QSettings key of the colour scheme: ``"system"``, ``"light"`` or ``"dark"``."""
+
+APPEARANCES = ("system", "light", "dark")
+"""The colour schemes to choose from (View → Appearance)."""
+
 RIGHT_PLOT_KEY = "view/right_plot"
 """QSettings key of the curve on the bottom panel's right axis: ``"w"``, ``"R"`` or ``"none"``."""
 
@@ -206,6 +212,16 @@ class Settings:
         if isinstance(value, str):
             return value.strip().lower() in {"1", "true", "yes", "on"}
         return bool(value)
+
+    def get_appearance(self) -> str:
+        """Return the saved colour scheme: ``"system"`` (default), ``"light"`` or ``"dark"``."""
+        value = self._settings.value(APPEARANCE_KEY, "system")
+        return value if value in APPEARANCES else "system"
+
+    def set_appearance(self, scheme: str) -> None:
+        """Save the colour scheme (``"system"``, ``"light"`` or ``"dark"``)."""
+        if scheme in APPEARANCES:
+            self._settings.setValue(APPEARANCE_KEY, scheme)
 
     def get_right_plot(self) -> Optional[str]:
         """Return the saved right-axis curve of the bottom panel (``"w"``, ``"R"`` or ``None``).

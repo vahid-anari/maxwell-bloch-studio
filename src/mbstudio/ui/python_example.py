@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from sciwidgets.style import is_dark
+
 from mbstudio.paths import EXAMPLE_SCRIPT_PATH
 from mbstudio.ui.dialogs import show_critical
 
@@ -43,7 +45,9 @@ class PythonExampleDialog(QDialog):
 
         browser = QTextBrowser(self)
         browser.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
-        browser.setHtml(highlight(self._code, PythonLexer(), HtmlFormatter(noclasses=True, nobackground=True)))
+        style = "monokai" if is_dark() else "default"  # syntax colours readable on the dark background
+        browser.setHtml(highlight(self._code, PythonLexer(),
+                                  HtmlFormatter(noclasses=True, nobackground=True, style=style)))
         browser.setLineWrapMode(QTextBrowser.NoWrap)
 
         copy_btn = QPushButton("Copy")

@@ -77,17 +77,17 @@ def set_app_style(app: QApplication):
         return s
 
     s = ""
-    s += _make_style_sheet("QLabel#chi_value", add=1, color="black")
-    s += "QStatusBar {border-top: 1px solid #999999;}"
+    s += _make_style_sheet("QLabel#chi_value", add=1)  # text colour from the palette (light or dark)
+    s += "QStatusBar {border-top: 1px solid palette(mid);}"
     s += """QGroupBox {
                     font-size: 16pt;
                     font-family: "Times New Roman";
                     font-weight: bold;
-                    border: 1px solid #bcbcbc;
+                    border: 1px solid palette(mid);
                     border-radius: 6px;
                     margin-top: 12px;
                     padding-top: 8px;
-                    background: white;
+                    background: palette(base);
             }"""
     s += """QGroupBox#no_title {
                     margin: 0 0 0 0;

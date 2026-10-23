@@ -8,7 +8,11 @@
 
 A PySide6 desktop application for simulating, visualizing, and fitting one-dimensional Maxwell-Bloch models to astronomical maser light-curve data. The application combines an interactive Qt interface, configurable physical and numerical parameters, Numba-accelerated time evolution, and publication-oriented plotting/export tools.
 
-<img src="https://raw.githubusercontent.com/vahid-anari/maxwell-bloch-studio/main/docs/figures/main_window.png" width="1512" alt="Maxwell Bloch Studio main window">
+<img src="https://raw.githubusercontent.com/vahid-anari/maxwell-bloch-studio/main/docs/figures/main_window.png" width="900" alt="Maxwell Bloch Studio main window">
+
+The pulse along the medium (the z slider), the coherence R on the right axis, and dark mode:
+
+![Maxwell Bloch Studio in use](https://raw.githubusercontent.com/vahid-anari/maxwell-bloch-studio/main/docs/figures/tour.gif)
 
 ## Features
 
@@ -21,6 +25,8 @@ A PySide6 desktop application for simulating, visualizing, and fitting one-dimen
 - Built-in visualization of fitted flux, inversion/population, pump terms, and other solver quantities.
 - Parameter saving/loading using JSON files.
 - Export to PDF, PNG, or SVG, with PDF exports including metadata and parameter reports.
+- Light and dark mode (View → Appearance: same as the system, light or dark); exports always use the
+  light colours.
 - Local user guide and equations reference.
 
 ## Installation
@@ -185,6 +191,11 @@ To run the tests:
 pip install -e ".[dev]"
 pytest
 ```
+
+`python tools/figures.py` retakes the pictures and animations in `docs/figures/`
+(`--list` for the names, `--dark` for dark mode), each in a fresh app with empty
+settings; `fit_mode` uses a made-up data folder. On macOS the pictures have the
+window's title bar and shadow; the terminal needs Screen Recording permission.
 
 `python main.py` in the repository root also starts the app from the source
 folder. The code lives in `src/mbstudio/`:

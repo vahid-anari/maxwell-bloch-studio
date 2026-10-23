@@ -635,6 +635,7 @@ inside the loaded data folder.
   Menu Item & Shortcut & Description \\
   \midrule
   Show Slider Range & \key{Ctrl+Alt+R} & Show or hide slider range labels \\
+  Appearance        & ---              & Same as System, Light or Dark (remembered) \\
   Reset Plot Style  & ---              & Return curve styles, grids, grid style and span style to their defaults \\
   \bottomrule
 \end{tabular}
@@ -642,6 +643,12 @@ inside the loaded data folder.
 
 Grid lines, curve colours, line styles and the span style are set from the plot's right-click menu
 (Section~\ref{sec:plot-style}).
+
+\textbf{Appearance} chooses the colours of the whole window: the same as the system (light or dark,
+following macOS when it switches), always light, or always dark. In dark mode the plot is dark too;
+curve colours that would be hard to see on the dark background are drawn lighter, and the style
+dialogs offer a separate colour for dark mode. Exported plots and PDF reports always use the light
+colours.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{Info and Help Menus}

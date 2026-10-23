@@ -86,8 +86,8 @@ class PlotExporter:
         path = Path(file_path)
         if path.suffix.lower() == ".pdf":
             self._save_pdf(file_path)
-        else:
-            self._canvas.figure.savefig(path, bbox_inches="tight")
+        else:  # light colours, also when the app is shown dark
+            self._canvas.export(str(path))
 
     def _save_pdf(self, file_path: str) -> None:
         """Save a PDF export containing the report figure and text pages.
