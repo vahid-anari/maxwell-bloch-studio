@@ -115,6 +115,7 @@ def test_solve_result_shapes():
         assert res[key].shape == (nt,), key
     assert res["intensity"].shape == (planes, nt)
     assert res["w"].shape == (planes, nt)
+    assert res["R"].shape == (planes, nt)
 
 
 def test_solve_accepts_old_key_names():

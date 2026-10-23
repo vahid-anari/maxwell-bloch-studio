@@ -32,6 +32,7 @@ class SolverResultsDisplay:
         time: Solver time array currently displayed.
         intensity: Displayed intensity array.
         w: Displayed population-inversion array.
+        R: Displayed coherence array.
         lambda_n: Displayed pump profile array.
         A0: Displayed boundary-field array.
     """
@@ -39,6 +40,7 @@ class SolverResultsDisplay:
     time: np.ndarray = field(default_factory=lambda: np.empty(0))
     intensity: np.ndarray = field(default_factory=lambda: np.empty(0))
     w: np.ndarray = field(default_factory=lambda: np.empty(0))
+    R: np.ndarray = field(default_factory=lambda: np.empty(0))
     lambda_n: np.ndarray = field(default_factory=lambda: np.empty(0))
     A0: np.ndarray = field(default_factory=lambda: np.empty(0))
     t1: np.ndarray = field(default_factory=lambda: np.empty(0))
@@ -170,6 +172,7 @@ class UpdatePipeline:
             get_results: Callable[[], dict],
             get_current_data: Callable[[], LightCurve],
             get_bottom_plot: Callable[[], Optional[str]],
+            get_right_plot: Callable[[], Optional[str]],
             get_fit_mode: Callable[[], bool],
             set_chi_square: Callable[[Optional[float]], None],
             update_current_span: Callable[[], None],
@@ -183,6 +186,8 @@ class UpdatePipeline:
             get_results: Callable returning the latest solver-result mapping.
             get_current_data: Callable returning the current raw light curve.
             get_bottom_plot: Callable returning the active bottom-panel curve ID.
+            get_right_plot: Callable returning the curve on the bottom panel's right axis
+                (``"w"``, ``"R"`` or ``None``).
             get_fit_mode: Callable returning whether fit mode is active.
             set_chi_square: Callback used to update the chi-square display.
             update_current_span: Callback that refreshes the cosh-peak marker.
@@ -193,6 +198,7 @@ class UpdatePipeline:
         self._get_results = get_results
         self._get_current_data = get_current_data
         self._get_bottom_plot = get_bottom_plot
+        self._get_right_plot = get_right_plot
         self._get_fit_mode = get_fit_mode
         self._set_chi_square = set_chi_square
         self._update_current_span = update_current_span
@@ -314,6 +320,7 @@ class UpdatePipeline:
         time = results["time"]
         intensity = results["intensity"][z_index]
         w = results["w"][z_index]
+        R = results["R"][z_index]
         lambda_n = results["lambda_n"]
         A0 = results["A0"]
         t1 = results["t1"]
@@ -331,6 +338,7 @@ class UpdatePipeline:
         self.displayed_curves.results.time = time
         self.displayed_curves.results.intensity = intensity
         self.displayed_curves.results.w = w
+        self.displayed_curves.results.R = R
         self.displayed_curves.results.lambda_n = lambda_n
         self.displayed_curves.results.A0 = A0
         self.displayed_curves.results.t1 = t1
@@ -338,12 +346,14 @@ class UpdatePipeline:
 
         canvas.set_flux(time, intensity)
         canvas.set_w_data(time, w)
+        canvas.set_R_data(time, R)
         canvas.set_profile_data("lambda_n", time, lambda_n)
         canvas.set_profile_data("A0", time, A0)
         canvas.set_profile_data("t1", time, t1)
         canvas.set_profile_data("t2", time, t2)
 
         canvas.show_profile(bottom_plot)
+        canvas.show_right(self._get_right_plot())
 
     def _update_range(self, params: dict[str, Any]) -> None:
         """Update all axis limits from the current display-range settings.
@@ -354,6 +364,7 @@ class UpdatePipeline:
         canvas = self._canvas
         dc = self.displayed_curves
         bottom_plot = self._get_bottom_plot()
+        right_plot = self._get_right_plot()
 
         canvas.set_time_limit(
             get_range(
@@ -370,12 +381,18 @@ class UpdatePipeline:
                 arr2=cut_y_by_x(y=dc.data.flux, x=dc.data.time, xmin=t_min, xmax=t_max),
             )
         )
-        canvas.set_w_y_limit(
-            get_range(
-                limits=params["display.range.w"],
-                arr1=cut_y_by_x(y=dc.results.w, x=dc.results.time, xmin=t_min, xmax=t_max),
+        if right_plot:
+            canvas.set_right_y_limit(
+                get_range(
+                    limits=params[f"display.range.{right_plot}"],
+                    arr1=cut_y_by_x(
+                        y=getattr(dc.results, right_plot),
+                        x=dc.results.time,
+                        xmin=t_min,
+                        xmax=t_max,
+                    ),
+                )
             )
-        )
         if bottom_plot:
             canvas.set_profile_y_limit(
                 get_range(

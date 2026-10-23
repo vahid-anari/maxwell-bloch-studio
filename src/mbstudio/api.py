@@ -46,7 +46,7 @@ def solve(params: Dict[str, Any]) -> Dict[str, np.ndarray]:
             ``"+inf"`` strings are accepted.
 
     Returns:
-        Dictionary with ``time``, ``intensity`` (z planes × time), ``w`` (z planes
+        Dictionary with ``time``, ``intensity``, ``w`` and ``R`` (each z planes
         × time), ``lambda_n`` (pump), ``A0`` (boundary field), ``t1`` and ``t2``,
         all in the solver's dimensionless units.
 

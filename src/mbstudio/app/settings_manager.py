@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from PySide6.QtCore import QSettings
 
@@ -33,6 +33,9 @@ VIEW_PREFERENCE_KEYS = {
     "show_w": "view/show_w",
 }
 """Map view-action identifiers to their persisted QSettings keys."""
+
+RIGHT_PLOT_KEY = "view/right_plot"
+"""QSettings key of the curve on the bottom panel's right axis: ``"w"``, ``"R"`` or ``"none"``."""
 
 PLOT_CONFIG_KEY = "plot/config"
 """QSettings key of the plot's user style (``PlotCanvas.get_config``)."""
@@ -203,6 +206,23 @@ class Settings:
         if isinstance(value, str):
             return value.strip().lower() in {"1", "true", "yes", "on"}
         return bool(value)
+
+    def get_right_plot(self) -> Optional[str]:
+        """Return the saved right-axis curve of the bottom panel (``"w"``, ``"R"`` or ``None``).
+
+        Before the choice existed, only w could be shown there, with a check box
+        (``view/show_w``); that setting decides between w and None.
+        """
+        value = self._settings.value(RIGHT_PLOT_KEY, None)
+        if value in ("w", "R"):
+            return value
+        if value == "none":
+            return None
+        return "w" if self.get_view_preference("show_w", True) else None
+
+    def set_right_plot(self, curve_id: Optional[str]) -> None:
+        """Save the right-axis curve of the bottom panel (``None`` = no curve)."""
+        self._settings.setValue(RIGHT_PLOT_KEY, curve_id or "none")
 
     def set_view_preference(self, action_id: str, checked: bool) -> None:
         """Persist one boolean view preference.

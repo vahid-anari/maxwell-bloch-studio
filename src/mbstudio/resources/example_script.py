@@ -46,6 +46,7 @@ print(f"eta = {derived['eta']:.4g}, theta0 = {derived['theta0']:.4g}")
 #   "time"        (nt,)
 #   "intensity"   (planes, nt)   row 0 = entrance (z = 0), row -1 = exit (z = 1)
 #   "w"           (planes, nt)   population inversion
+#   "R"           (planes, nt)   coherence
 #   "lambda_n"    (nt,)          total pump
 #   "A0"          (nt,)          field entering at z = 0
 #   "t1", "t2"    (nt,)          relaxation times on the time grid

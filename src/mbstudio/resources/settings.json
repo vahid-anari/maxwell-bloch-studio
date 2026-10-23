@@ -169,6 +169,7 @@
           }
         },
         "twin": {
+          "select": "one",
           "primary": "w",
           "grid": {
             "linestyle": ":"
@@ -179,6 +180,17 @@
               "unit": "-",
               "props": {
                 "color": "magenta",
+                "linestyle": "-",
+                "linewidth": 1.25,
+                "zorder": 3
+              }
+            },
+            "R": {
+              "label": "R",
+              "unit": "-",
+              "name": "R",
+              "props": {
+                "color": "darkviolet",
                 "linestyle": "-",
                 "linewidth": 1.25,
                 "zorder": 3
@@ -841,6 +853,11 @@
                   "type": "range-slider",
                   "path": "display.range.w",
                   "label": "w"
+                },
+                {
+                  "type": "range-slider",
+                  "path": "display.range.R",
+                  "label": "R"
                 },
                 {
                   "type": "range-slider",

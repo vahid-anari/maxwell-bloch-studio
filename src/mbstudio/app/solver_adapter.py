@@ -47,7 +47,7 @@ def solve_maxwell_bloch(params: Mapping[str, Any]) -> dict[str, np.ndarray]:
         params: Flat parameter mapping from the parameter tabs.
 
     Returns:
-        Mapping with ``time``, ``intensity``, ``w``, ``lambda_n`` (pump),
+        Mapping with ``time``, ``intensity``, ``w``, ``R``, ``lambda_n`` (pump),
         ``A0`` (boundary field) and ``t1``, ``t2`` on the time grid.
     """
     solver = solve_1d_adiabatic if params.get("solve.adiabatic", False) else solve_1d
@@ -75,6 +75,7 @@ def solve_maxwell_bloch(params: Mapping[str, Any]) -> dict[str, np.ndarray]:
         "time": res.time,
         "intensity": res.intensity,
         "w": res.w,
+        "R": res.R,
         "lambda_n": res.pump,
         "A0": res.field_in,
         "t1": res.t1,

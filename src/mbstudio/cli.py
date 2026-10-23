@@ -196,7 +196,7 @@ def _command_parser(command: str) -> argparse.ArgumentParser:
             prog=f"{PROG} solve",
             description="Solve a parameter file saved by the app, without the window, and save "
                         "the results (same numbers as the app) to a .npz file. The file holds "
-                        "the arrays time, intensity, w, lambda_n, A0, t1, t2 and the parameters "
+                        "the arrays time, intensity, w, R, lambda_n, A0, t1, t2 and the parameters "
                         "as JSON text (params).")
         p.add_argument("file", help="parameter file saved by the app")
         p.add_argument("--velocity", help="velocity component, for the parameter file of a data folder")

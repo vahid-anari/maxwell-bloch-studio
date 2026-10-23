@@ -3,7 +3,8 @@
 The canvas is a ``sciwidgets.plot.PlotCanvas`` built from the ``"plot"``
 section of ``resources/settings.json``: the top panel holds the measured data
 points and the flux, the bottom panel one selectable profile (pump, boundary
-condition, T1 or T2) with the population inversion w on a right twin axis.
+condition, T1 or T2) with the population inversion w or the coherence R on a
+right twin axis.
 This module adds MB Studio's names for its curves and panels, and the
 exporter that builds standalone figures and PDF reports.
 """
@@ -42,7 +43,10 @@ class PlotExporter:
     """Height of the top (data/flux) panel in inches."""
 
     _PANEL_HEIGHT = 1.2
-    """Height of each lower panel in inches."""
+    """Height of each lower panel in inches (less when they would not fit on the page)."""
+
+    _BOTTOM_ROOM = 0.9
+    """Space kept below the last panel for its time label and the page footer, in inches."""
 
     _PAGE_SIZE = (8.27, 11.69)
     """A4 page size in inches."""
@@ -220,7 +224,7 @@ class PlotExporter:
         return wrapped
 
     def _build_export_figure(self) -> plt.Figure:
-        """Build the report figure: data/flux, w, then each non-trivial profile.
+        """Build the report figure: data/flux, w, R, then each non-trivial profile.
 
         Pump and boundary-condition panels are shown only if they are not zero
         everywhere, and T1/T2 panels only if they vary in time. Omitted panels
@@ -237,12 +241,14 @@ class PlotExporter:
         t_min, t_max = self._canvas.get_time_limits()
 
         shown, omitted = self._select_profiles(res)
-        panel_ids = ["w"] + shown
-        heights = [self._TOP_HEIGHT] + [self._PANEL_HEIGHT] * len(panel_ids)
+        panel_ids = ["w", "R"] + shown
 
         page_w, page_h = self._PAGE_SIZE
         margin_left, margin_right, margin_top = 1.0, 0.5, 1.0  # inches
-        gap = 0.12  # space between panels, inches
+        gap = 0.22  # space between panels, inches (room for a "1e-9" multiplier above a panel)
+        room = page_h - margin_top - self._BOTTOM_ROOM - self._TOP_HEIGHT - gap * len(panel_ids)
+        panel_h = min(self._PANEL_HEIGHT, room / len(panel_ids))  # shrink when every panel is shown
+        heights = [self._TOP_HEIGHT] + [panel_h] * len(panel_ids)
         content_h = sum(heights) + gap * (len(heights) - 1)
 
         fig = plt.figure(figsize=(page_w, page_h))
@@ -272,7 +278,7 @@ class PlotExporter:
         top_ax.set_ylabel(self._axis_label(flux_label, flux_unit), usetex=use_tex)
         self._style_axis(top_ax, zero_line, flux_style["color"], "flux")
 
-        # ---- lower panels: w, then the selected profiles ----
+        # ---- lower panels: w, R, then the non-trivial profiles ----
         for ax, curve_id in zip(axes[1:], panel_ids):
             ys = getattr(res, curve_id)
             style = self._canvas.get_curve_style(curve_id) or {}
@@ -283,8 +289,8 @@ class PlotExporter:
                 limits=params[f"display.range.{curve_id}"],
                 arr1=cut_y_by_x(y=ys, x=res.time, xmin=t_min, xmax=t_max),
             ))
-            if curve_id == "w":
-                self._style_axis(ax, zero_line, style["color"], "w", dotted=True)
+            if curve_id in ("w", "R"):
+                self._style_axis(ax, zero_line, style["color"], curve_id, dotted=True)
             else:
                 self._style_axis(ax, zero_line, style["color"], "bottom")
 
@@ -364,7 +370,7 @@ class PlotExporter:
             title = title.replace("_", r"\_").replace("%", r"\%")
         return title
 
-    _GRID_AXIS = {"flux": "top", "w": "bottom.twin", "bottom": "bottom"}
+    _GRID_AXIS = {"flux": "top", "w": "bottom.twin", "R": "bottom.twin", "bottom": "bottom"}
     """Live-canvas panel whose y grid each export panel copies."""
 
     def _style_axis(self, ax: plt.Axes, zero_line, color: str, y_prefix: str, dotted: bool = False) -> None:
@@ -374,8 +380,8 @@ class PlotExporter:
             ax: Target axis.
             zero_line: Zero line returned by ``style_axes``.
             color: Colour of the panel's curve.
-            y_prefix: Which canvas grid to copy (``"flux"``, ``"w"`` or ``"bottom"``).
-            dotted: Whether the y grid is dotted (used for w).
+            y_prefix: Which canvas grid to copy (``"flux"``, ``"w"``, ``"R"`` or ``"bottom"``).
+            dotted: Whether the y grid is dotted (used for w and R, the right-axis curves).
         """
         zero_line.set_color(color)
         zero_line.set_alpha(0.6)
@@ -441,8 +447,8 @@ class PlotCanvas(_SciPlotCanvas):
     """The main plot, with MB Studio's names for its curves and panels.
 
     Panels: ``top`` (data points and flux), ``bottom`` (one profile) and
-    ``bottom.twin`` (w). Curves: ``data_points``, ``flux``, ``lambda_n``,
-    ``A0``, ``t1``, ``t2``, ``w``. Markers: ``span`` and ``span_center``
+    ``bottom.twin`` (w or R). Curves: ``data_points``, ``flux``, ``lambda_n``,
+    ``A0``, ``t1``, ``t2``, ``w``, ``R``. Markers: ``span`` and ``span_center``
     (the current pulse or step).
     """
 
@@ -476,6 +482,10 @@ class PlotCanvas(_SciPlotCanvas):
         """Update the w curve."""
         self.set_curve_data("w", xs, ys)
 
+    def set_R_data(self, xs: np.ndarray, ys: np.ndarray) -> None:
+        """Update the R (coherence) curve."""
+        self.set_curve_data("R", xs, ys)
+
     def get_profile_combo_labels(self) -> Dict[str, str]:
         """Return the display names of the profiles."""
         return {cid: self.get_curve_name(cid) for cid in self.curve_ids("bottom")}
@@ -501,8 +511,8 @@ class PlotCanvas(_SciPlotCanvas):
         """Set the profile (left) y limits of the bottom panel."""
         self.set_limits("bottom", y=limit)
 
-    def set_w_y_limit(self, limit: Tuple[float, float]) -> None:
-        """Set the w (right) axis limits."""
+    def set_right_y_limit(self, limit: Tuple[float, float]) -> None:
+        """Set the right-axis (w or R) limits of the bottom panel."""
         self.set_limits("bottom.twin", y=limit)
 
     def set_time_label(self, label: str, unit: str) -> None:
@@ -577,13 +587,9 @@ class PlotCanvas(_SciPlotCanvas):
         """Show one profile in the bottom panel, or none (``None``)."""
         self.select_curve("bottom", name)
 
-    def set_w_visible(self, visible: bool) -> None:
-        """Show or hide w and its right-hand axis."""
-        self.set_axis_visible("bottom.twin", visible)
-
-    def is_w_visible(self) -> bool:
-        """Return whether w is shown."""
-        return self.is_axis_visible("bottom.twin")
+    def show_right(self, name: Optional[str]) -> None:
+        """Show w or R on the bottom panel's right axis, or neither (``None``)."""
+        self.select_curve("bottom.twin", name)
 
 
 def _demo_main() -> int:
@@ -611,7 +617,7 @@ def _demo_main() -> int:
     canvas.set_time_limit((0.0, 2000.0))
     canvas.set_flux_limit((0.0, 2.2))
     canvas.set_profile_y_limit((-0.1, 1.1))
-    canvas.set_w_y_limit((-1.1, 1.1))
+    canvas.set_right_y_limit((-1.1, 1.1))
     canvas.set_time_label("t", "T_0")
     canvas.set_flux_label("I", "I_0")
     canvas.set_current_span_position(800.0, 120.0, 120.0)

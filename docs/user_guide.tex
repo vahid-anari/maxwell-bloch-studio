@@ -223,7 +223,7 @@ the same Python; add \texttt{-{}-yes} to skip the question. A copy installed fro
 \texttt{mbstudio solve FILE} computes the same numbers as the app and saves them to
 \texttt{FILE\_results.npz} next to the file (\texttt{-o NAME.npz} or \texttt{-{}-output-dir DIR}
 to choose). The file holds the arrays \texttt{time}, \texttt{intensity}, \texttt{w},
-\texttt{lambda\_n}, \texttt{A0}, \texttt{t1}, \texttt{t2} (as in
+\texttt{R}, \texttt{lambda\_n}, \texttt{A0}, \texttt{t1}, \texttt{t2} (as in
 Section~\ref{sec:python}) and the parameters as JSON text, \texttt{params}; read it with
 \texttt{numpy.load}. For the parameter file of a data folder, choose a velocity with
 \texttt{-{}-velocity 12.3}, or solve every velocity with \texttt{-{}-all}, one file each.
@@ -260,9 +260,10 @@ The main window is divided into three user-facing areas.
   driving terms, fit alignment, and display ranges.
 \end{itemize}
 
-A selector labeled \textbf{Bottom Plot} appears beside the velocity controls and chooses which
-auxiliary quantity is shown in the lower panel. The \textbf{w} check box next to it shows or hides
-the population inversion on the panel's right axis. Both show each curve's colour.
+The \textbf{Bottom Plot} selectors appear beside the velocity controls: \textbf{Left} chooses
+which auxiliary quantity is shown on the lower panel's left axis, and \textbf{Right} chooses
+between the population inversion $w$, the coherence $R$ and None on its right axis. Both show
+each curve's colour.
 
 Figure~\ref{fig:main-window} shows the window in standalone mode.
 \begin{figure}[htbp]
@@ -418,13 +419,14 @@ The \tab{Range} tab controls the visible axis limits for:
 \begin{itemize}[noitemsep]
   \item time,
   \item top-panel flux/intensity,
-  \item $w$,
+  \item $w$ and $R$,
   \item $\Lambda_n$,
-  \item $A\vert_{z=0}$.
+  \item $A\vert_{z=0}$,
   \item $T_1$,
   \item $T_2$.
 \end{itemize}
-Each quantity uses a two-handle range slider.
+Each quantity uses a two-handle range slider. The sliders of the bottom panel are shown only
+for the curves currently selected there.
 
 % ══════════════════════════════════════════════════════════════════════════════
 \section{The Plot Area}
@@ -440,7 +442,7 @@ In fit mode, the plotted data points come from the loaded light-curve file for t
 
 \subsection{Bottom Panel}
 
-The bottom panel displays one auxiliary quantity chosen from the \textbf{Bottom Plot} selector:
+The bottom panel displays one auxiliary quantity chosen with the \textbf{Left} selector:
 \begin{center}
 \begin{tabular}{@{}ll@{}}
   \toprule
@@ -454,8 +456,10 @@ The bottom panel displays one auxiliary quantity chosen from the \textbf{Bottom 
   \bottomrule
 \end{tabular}
 \end{center}
-The population inversion $w$ at the selected $z$ slice is drawn on a separate right axis of the
-same panel and is shown or hidden with the \textbf{w} check box, independently of the selector.
+The \textbf{Right} selector draws the population inversion $w$ or the coherence $R$ at the
+selected $z$ slice on a separate right axis of the same panel (or None), independently of the
+left one. Only one of them is shown at a time: $R$ is usually much smaller than $w$ (it starts at
+$\sin\theta_0$), so on a shared axis it would look like a flat line.
 
 \subsection{Current Span Marker}\label{sec:current-span}
 
@@ -680,7 +684,9 @@ is updated with \texttt{git pull} instead, so the button is off there.
 Use \menu{File $\to$ Export Plot...} to save the current figure.
 
 \begin{itemize}[noitemsep]
-  \item \textbf{PDF:} exports the current plot on the first page and appends one or more text-report pages
+  \item \textbf{PDF:} the first page is a report figure: the top panel, then one panel each for
+  $w$ and $R$, then the pump, boundary field, $T_1$ and $T_2$ where they are not trivial. It
+  appends one or more text-report pages
   starting with \emph{How to cite} (the references of the app and of mbsolver, with versions and DOIs),
   then metadata and the current parameter values.
   \item \textbf{PNG / SVG:} exports the figure only.
@@ -755,7 +761,7 @@ res["intensity"][-1]    # intensity at the exit of the medium
   ($\nu$, $\Gamma$, $T_0$, $L$, $n_0$), as in the app;
   \texttt{mbstudio.scaling(nu=..., gamma=..., t0=..., l=..., n0=...)} returns them
   together with the other derived quantities.
-  \item The result holds \texttt{time}, \texttt{intensity} and \texttt{w} (one row per
+  \item The result holds \texttt{time}, \texttt{intensity}, \texttt{w} and \texttt{R} (one row per
   stored $z$ plane, from the entrance to the exit), \texttt{lambda\_n} (pump),
   \texttt{A0} (boundary field), \texttt{t1} and \texttt{t2}, in the solver's dimensionless
   units. The flux scaling and offsets of the Fit Mode tab are not applied.

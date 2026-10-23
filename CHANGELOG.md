@@ -4,6 +4,15 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.8.0 — 2026-10-22
+- The bottom plot has a second selector, **Right**, for its right axis: w (as before), the
+  coherence R, or None. It replaces the w check box; the choice is remembered. The Range tab
+  has a slider for R, shown while R is selected.
+- PDF reports have an R panel after the w panel (panels get a little shorter when every
+  profile is shown, so they still fit on the page).
+- `mbstudio solve` writes `R` into the `.npz` file, and `mbstudio.solve` returns it.
+- Requires mbsolver 0.6.0 (its `solve_1d` returns R).
+
 ## 10.7.5 — 2026-10-19
 - Help → Check for Updates… chosen while the automatic check at start-up was still running no
   longer shows the update notice twice (sciwidgets 0.12.2).

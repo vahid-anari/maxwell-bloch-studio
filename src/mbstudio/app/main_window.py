@@ -94,7 +94,7 @@ from mbstudio.config.ui_defaults import NATIVE_MENU_BAR
 splash_message("Importing config packages / menu bar...")
 splash_message("Importing config packages / status bar...")
 from enum import Enum
-from sciwidgets.plot import CurveCheckBox, CurveSelector
+from sciwidgets.plot import CurveSelector
 from sciwidgets.window import MenuBarController, StatusBarController
 
 splash_message("Importing config packages / helper functions...")
@@ -207,6 +207,7 @@ class MBESolverApp(QMainWindow):
             get_results=lambda: self._results,
             get_current_data=lambda: self._current_data,
             get_bottom_plot=lambda: self._bottom_plot,
+            get_right_plot=lambda: self._right_plot,
             get_fit_mode=lambda: self._fit_mode,
             set_chi_square=self._velocity_bar.set_chi_square,
             update_current_span=self._update_current_span,
@@ -245,6 +246,7 @@ class MBESolverApp(QMainWindow):
         # ---- bottom panel selector ----
         self._bottom_plot_combo = self._make_curve_selector()
         self._bottom_plot = self._bottom_plot_combo.currentData()
+        self._right_plot = self._right_plot_combo.currentData()
 
         # ---- connect signals ----
         self._menu_bar.actionTriggered.connect(self._on_menu_action_triggered)
@@ -255,7 +257,7 @@ class MBESolverApp(QMainWindow):
         self._parameter_tabs.spanChanged.connect(self._on_span_changed)
         self._parameter_tabs.showSpan.connect(self._on_show_span)
         self._bottom_plot_combo.currentIndexChanged.connect(lambda _: self._on_bottom_plot_changed())
-        self._show_w_cb.toggled.connect(self._on_show_w_toggled)
+        self._right_plot_combo.curveSelected.connect(lambda _: self._on_right_plot_changed())
         self._canvas.configChanged.connect(self._settings.save_plot_config)
 
         self._factory_default_config = self._parameter_tabs.get_config()
@@ -283,24 +285,28 @@ class MBESolverApp(QMainWindow):
         layout.addWidget(self._parameter_tabs, 0)
 
     def _make_curve_selector(self) -> CurveSelector:
-        """Create the bottom-panel selector and w toggle, and add them to the toolbar.
+        """Create the bottom-panel selectors for the left and right axes, and add them to the toolbar.
 
-        Both show the curves' colours and follow colour changes made in the
+        Left: one profile (pump, boundary field, T1, T2) or None. Right: w, R or
+        None. Both show the curves' colours and follow colour changes made in the
         plot's right-click menu.
 
         Returns:
-            Combo box used to select the active bottom-panel profile.
+            Combo box used to select the active bottom-panel profile (left axis).
         """
         combo = CurveSelector(self._canvas, "bottom", none_text="None")
-        self._show_w_cb = CurveCheckBox(self._canvas, "w", text="w", axis="bottom.twin")
+        self._right_plot_combo = CurveSelector(self._canvas, "bottom.twin", none_text="None")
 
         wrapper = QWidget()
         layout = QHBoxLayout(wrapper)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(QLabel("Bottom Plot:"))
+        layout.addSpacing(4)
+        layout.addWidget(QLabel("Left"))
         layout.addWidget(combo)
         layout.addSpacing(8)
-        layout.addWidget(self._show_w_cb)
+        layout.addWidget(QLabel("Right"))
+        layout.addWidget(self._right_plot_combo)
         self._velocity_bar.add_widget(wrapper)
         return combo
 
@@ -462,16 +468,13 @@ class MBESolverApp(QMainWindow):
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(path.resolve())))
 
     def _apply_saved_view_preferences(self) -> None:
-        """Restore the persisted slider-range and w visibility settings on startup."""
+        """Restore the persisted slider-range setting and the right-axis curve on startup."""
         for action_id in MENU_CHECKABLE_IDS:
             checked = self._settings.get_view_preference(action_id, False)
             self._menu_bar.set_checked(action_id, checked)
             self._handle_checkable_menu_action(action_id, checked, persist=False, redraw=False)
-        show_w = self._settings.get_view_preference("show_w", True)
-        self._show_w_cb.blockSignals(True)
-        self._show_w_cb.setChecked(show_w)
-        self._show_w_cb.blockSignals(False)
-        self._on_show_w_toggled(show_w, persist=False)
+        self._right_plot_combo.set_current(self._settings.get_right_plot())
+        self._on_right_plot_changed(persist=False)
 
         self._canvas.redraw()
 
@@ -1069,18 +1072,21 @@ class MBESolverApp(QMainWindow):
             self._parameter_tabs.set_widget_visible(f"display.range.{data}", data == bottom_plot)
         self._pipeline.request(plot=True, current_span=True)
 
-    def _on_show_w_toggled(self, checked: bool, persist: bool = True) -> None:
-        """Show or hide w and its range slider in the bottom panel.
+    def _on_right_plot_changed(self, persist: bool = True) -> None:
+        """Handle a change of the right-axis curve (w, R or None) of the bottom panel.
+
+        Shows only the chosen curve's range slider and redraws.
 
         Args:
-            checked: Whether w should be shown.
-            persist: Whether to save the choice as a view preference.
+            persist: Whether to save the choice for the next start.
         """
-        self._canvas.set_w_visible(checked)
-        self._parameter_tabs.set_widget_visible("display.range.w", checked)
-        self._canvas.redraw()
+        right_plot = self._right_plot_combo.current()
+        self._right_plot = right_plot
+        for curve_id in ("w", "R"):
+            self._parameter_tabs.set_widget_visible(f"display.range.{curve_id}", curve_id == right_plot)
         if persist:
-            self._settings.set_view_preference("show_w", checked)
+            self._settings.set_right_plot(right_plot)
+        self._pipeline.request(plot=True)
 
     def _on_params_value_changed(self, path: str, value: Any) -> None:
         """Route a parameter-widget change to the appropriate update tasks.
