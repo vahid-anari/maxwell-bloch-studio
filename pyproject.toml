@@ -34,7 +34,7 @@ dependencies = [
     "matplotlib>=3.7",
     "psutil>=5.9",
     "pygments>=2.0",
-    "sciwidgets~=0.14.0",
+    "sciwidgets~=0.14.1",
     "mbsolver~=0.6.0",
 ]
 

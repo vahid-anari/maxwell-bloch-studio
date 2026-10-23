@@ -9,7 +9,7 @@ where the app's update notice reads it.
   plot and the parameter panels follow; curve colours too dark for the dark plot are drawn lighter,
   and the plot's style dialogs offer an own colour for dark mode. Exported plots (PNG, SVG) and PDF
   reports always use the light colours. The "Use from Python" example has dark syntax colours.
-- Requires sciwidgets 0.14.0.
+- Requires sciwidgets 0.14.1.
 - `tools/figures.py` (repo only) retakes the README and User Guide pictures and the new `tour.gif`.
 
 ## 10.8.0 — 2026-10-22
