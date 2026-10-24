@@ -4,6 +4,11 @@ What changed in each version of Maxwell Bloch Studio, newest first. Pushing a
 version's tag publishes its section as the GitHub Release (`.github/workflows/release.yml`),
 where the app's update notice reads it.
 
+## 10.9.2 — 2026-10-24
+- Requires sciwidgets 0.15.4, so Studio gets its recent fixes: update checks and Update Now use
+  certifi's certificates (with Python from python.org on macOS they failed with
+  CERTIFICATE_VERIFY_FAILED), and the update notice wraps long commands instead of widening the window.
+
 ## 10.9.1 — 2026-10-23
 - Dark mode: menu separators and the edges of input fields are visible, and disabled values are
   easier to read (sciwidgets 0.14.2).
